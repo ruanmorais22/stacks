@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    networks:
+     - minha_rede # INFORME O NOME DA SUA REDE DE STACKS
+    volumes:
+     - pgadmin_data:/var/lib/pgadmin
+    environment:
+     - PGADMIN_DEFAULT_EMAIL=seuemail@gmail.com.br # INFORME UM EMAIL PARA ACESSAR O PGADMIN
+     - PGADMIN_DEFAULT_PASSWORD=GERAR-NOVA-SENHA # GERAR EM https://www.avast.com/random-password-generator#pc    
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits: # CONFIGURAÇÃO DE RECURSOS COMPARTILHADOS COM O SERVIÇO
+          cpus: "1"
+          memory: 1024M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.pgadmin.rule=Host(`pgadmin.SEUDOMINIO.com`) # ENDEREÇO PARA ACESSAR O PGADMIN
+        - traefik.http.routers.pgadmin.entrypoints=websecure
+        - traefik.http.routers.pgadmin.tls.certresolver=letsencryptresolver
+        - traefik.http.services.pgadmin.loadBalancer.server.port=80
+        - traefik.http.routers.pgadmin.service=pgadmin
+
+networks:
+  minha_rede: # INFORME O NOME DA SUA REDE DE STACKS
+    external: true
+    name: minha_rede # INFORME O NOME DA SUA REDE DE STACKS
+
+volumes:
+  pgadmin_data:
+    external: true
+    name: pgadmin_data
