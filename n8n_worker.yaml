@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  n8n_worker:
+    image: n8nio/n8n:latest
+    command: worker --concurrency=10 # comando padrão para subir o processamento do N8N
+    networks:
+      - minha_rede #NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n # Nome do Banco de Dados (ATENÇÃO: precisa criar a base com este nome antes de subir a stack)
+      - DB_POSTGRESDB_HOST=postgres # Host do Banco de Dados
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=postgres # Usuário do Banco de Dados (Geralmente utiliza o postgres)
+      - DB_POSTGRESDB_PASSWORD=INFORME-SENHA-ACESSO-AO-POSTGRES
+      - N8N_ENCRYPTION_KEY=GERAR-CHAVE # GERAR EM https://www.avast.com/random-password-generator#pc    
+      - N8N_HOST=subdominio.SEUDOMINIO.com  # Host do Editor do N8N (Ex: processamento.SEUDOMINIO.com.br)
+      - N8N_EDITOR_BASE_URL=https://subdominio.SEUDOMINIO.com/ # Endereço do Editor do N8N (Ex: https://processamento.SEUDOMINIO.com.br/)
+      - WEBHOOK_URL=https://subdominio.SEUDOMINIO.com/ # Endereço do Webhook (Ex: https://webhook.SEUDOMINIO.com.br/)
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis # Configura o host do Redis
+      - QUEUE_BULL_REDIS_PORT=6379 # Configura a porta do Redis
+      - QUEUE_BULL_REDIS_DB=2 # Indice do banco de dados do Redis (Deixei dois pq o padrão é 0)
+      #- QUEUE_BULL_REDIS_PASSWORD='INFORME-A-SENHA-DE-ACESSO-AO-REDIS' # Configura a senha do Redis (caso você use senha no redis)
+      - NODE_FUNCTION_ALLOW_EXTERNAL=moment,lodash,moment-with-locales,uuid,crypto-js # Configura as bibliotecas externas que serão utilizadas
+      - EXECUTIONS_DATA_PRUNE=true # Limpeza dos dados de execução
+      - EXECUTIONS_DATA_MAX_AGE=336 # # Configura o tempo máximo de armazenamento dos dados de execução - 2 semanas
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=true # Habilita as notificações de novas versões do N8N
+      - N8N_PUBLIC_API_SWAGGERUI_DISABLED=false # Configura o N8N para exibir a documentação da API pública
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1" # Define a quantidade de processadores
+          memory: 1024M # Define a quantidade de RAM
+      update_config:
+        parallelism: 1 # Configura o paralelismo de atualização
+        delay: 30s # Configura o tempo de espera entre as atualizações
+        order: start-first # Configura a ação em caso de falha
+        failure_action: rollback # Configura a ação em caso de falha
+networks:
+  minha_rede:  # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    name: minha_rede # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    external: true 
