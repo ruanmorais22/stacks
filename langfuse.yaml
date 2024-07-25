@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  langfuse:
+    image: ghcr.io/langfuse/langfuse:latest
+    volumes:
+     - langfuse_data:/root/.langfuse    
+    networks:
+     - minha_rede
+    ports:
+      - "3006:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:SENHA-DE-ACESSO-AO-POSTGRES@HOST:5432/BASEDADOS # EXEMPLO: postgresql://postgres:123mudar@pgbouncer:5432/langfuse
+      - NEXTAUTH_SECRET=GERAR-SENHA # GERAR EM https://www.avast.com/random-password-generator#pc
+      - SALT=GERAR-CHAVE-ALEATORIA-CRIPTOGRAFIA # GERAR EM https://www.avast.com/random-password-generator#pc
+      - NEXTAUTH_URL=https://langfuse.SEUDOMINIO.com.br
+      - TELEMETRY_ENABLED=${TELEMETRY_ENABLED:-true}
+      - NEXT_PUBLIC_SIGN_UP_DISABLED=${NEXT_PUBLIC_SIGN_UP_DISABLED:-false}
+      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=${LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES:-false}
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+          constraints:
+            - node.role == manager
+      resources:
+          limits:
+            cpus: "1"
+            memory: 1024M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.langfuse.rule=Host(`langfuse.SEUDOMINIO.com.br`)
+        - traefik.http.routers.langfuse.entrypoints=websecure
+        - traefik.http.routers.langfuse.tls.certresolver=letsencryptresolver
+        - traefik.http.services.langfuse.loadbalancer.server.port=3000
+        - traefik.http.routers.langfuse.service=langfuse
+networks:
+  minha_rede:
+    external: true
+    name: minha_rede
+
+volumes:
+  langfuse_data:
+    external: true
