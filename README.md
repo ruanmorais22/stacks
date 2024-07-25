@@ -1,7 +1,6 @@
 # Orientações Personalizadas
 
-Bem-vindo à Automatize! Este documento foi criado para ajudar você a configurar as stacks para utilizar os serviços hospedados no seu próprio servidor. Em caso de dúvidas, estamos disponíveis no servidor exclusivo para alunos no Discord. Aproveite ao máximo!
-
+Bem-vindo à Automatize! Este documento foi criado para ajudar você a configurar as stacks para utilizar os serviços hospedados no seu próprio servidor.
 ## Stacks
 
 Aqui você encontrará todas as stacks pré-configuradas, precisando apenas de alguns ajustes específicos. Cada stack tem sua própria complexidade, então é importante entender um pouco sobre as configurações da aplicação para configurá-la corretamente. Dentro de cada stack, você verá um guia simples para preencher conforme o ambiente do seu servidor (IP, domínios, recursos, etc).
@@ -77,6 +76,7 @@ resources:
     limits:
         cpus: "1" # Define a quantidade de processadores
         memory: 1024M # Define a quantidade de RAM
+
 
 
 
