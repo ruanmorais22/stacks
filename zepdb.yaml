@@ -1,0 +1,41 @@
+version: "3.7"
+
+services:
+
+  # Define o Serviço do Postgres exclusivo do ZEP
+  zepdb:
+    # usa uma imagem customizada do Postgres do próprio zep
+    image: ghcr.io/getzep/postgres:latest
+    environment:
+      - POSTGRES_USER=postgres # Configura o usuário do Postgres
+      - POSTGRES_PASSWORD=GERAR-NOVA-SENHA # GERAR EM https://www.avast.com/random-password-generator#pc    
+    # Configura a rede do Postgres
+    ports:
+     - 5433:5432
+    networks:
+      - minha_rede
+    # Configura o volume do Postgres
+    volumes:
+      - zepdb_data:/var/lib/postgresql/data
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1" # Define a quantidade de processadores
+          memory: 1024M # Define a quantidade de RAM
+
+# Configura a rede do Postgres
+networks:
+  minha_rede:
+    name: minha_rede
+    external: true
+
+# Configura o volume do Postgres
+volumes:
+  zepdb_data:
+    name: zepdb_data
+    external: true
