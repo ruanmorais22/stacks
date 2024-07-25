@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  redis_insight:
+    image: redis/redisinsight:latest 
+    networks:
+     - minha_rede #NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    volumes:
+     - redis_insight_data:/db
+    environment:
+     - RI_BASE_API_URL=https://redis.SEUDOMINIO.com.br # Endereço de acesso ao Redis Insight (Exemplo: https://redis.SEUDOMINIO.com.br)
+     - RI_RESOURCES_BASE_URL=https://redis.SEUDOMINIO.com.br  # Endereço de acesso ao Redis Insight (Exemplo: https://redis.SEUDOMINIO.com.br)
+     - RI_APP_PORT=5001
+     - RI_API_PREFIX=api
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1" # Define a quantidade de processadores
+          memory: 1024M # Define a quantidade de RAM
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.redis_insight.rule=Host(`red.SEUDOMINIO.com.br`)  # Endereço de do Redis Insight
+        - traefik.http.routers.redis_insight.entrypoints=websecure
+        - traefik.http.routers.redis_insight.tls.certresolver=letsencryptresolver
+        - traefik.http.services.redis_insight.loadBalancer.server.port=5001
+        - traefik.http.routers.redis_insight.service=redis_insight
+        - traefik.http.services.redis_insight.loadbalancer.passHostHeader=true
+
+networks:
+  minha_rede:  # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    name: minha_rede # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    external: true 
+
+volumes:
+  redis_insight_data:
+    external: true
+    name: redis_insight_data
