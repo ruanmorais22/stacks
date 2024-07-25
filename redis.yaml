@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+  # Definição do Serviço do Redis
+  redis:
+    image: redis:latest
+    networks:
+      - minha_rede #NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    ports:
+    - 6379:6379
+    volumes:
+      - redis_data:/data
+    # Caso queira instanciar o Redis com senha de acesso, comente a linha de cima e descomente a de baixo
+    command: redis-server --appendonly yes --port 6379 --maxclients 100000 # Define o comando de inicialização do serviço (SEM SENHA)
+    # command: redis-server --appendonly yes --port 6379 --maxclients 100000 --requirepass SENHA_DE_ACESSO   # Define o comando de inicialização do serviço (COM SENHA)
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1" # Define a quantidade de processadores
+          memory: 1024M # Define a quantidade de RAM
+volumes:
+  redis_data:
+    external: true
+    name: redis_data
+networks:
+  minha_rede:  # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    name: minha_rede # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
+    external: true 
