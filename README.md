@@ -20,7 +20,8 @@ redis_insight_data:/db #PASTA A SER SALVA NO DIRETORIO MAPEADO
 CONFIGURAÇÕES REMOVIDAS POR BREVIDADE
 volumes: redis_insight_data: external: true name: redis_insight_data
 
-Configurações de rede ☑️ Sempre mantenha as aplicações na mesma rede do Docker para que as aplicações possam se comunicar corretamente.
+Configurações de rede 
+☑️ Sempre mantenha as aplicações na mesma rede do Docker para que as aplicações possam se comunicar corretamente.
 
 CONFIGURAÇÕES REMOVIDAS POR BREVIDADE
 networks: - minha_rede #NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
@@ -28,7 +29,8 @@ networks: - minha_rede #NOME DA REDE UTILIZADA NAS STACKS ANTERIORES
 CONFIGURAÇÕES REMOVIDAS POR BREVIDADE
 networks: minha_rede: # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES name: minha_rede # NOME DA REDE UTILIZADA NAS STACKS ANTERIORES external: true
 
-Possui acesso por subdominio? ☑️ Verifique se o endereço do domínio no traefik está correto
+Possui acesso por subdominio? 
+☑️ Verifique se o endereço do domínio no traefik está correto
 
 traefik.http.routers.redis_insight.rule=Host(subdominio.SEUDOMINIO.com.br
 
@@ -36,10 +38,19 @@ traefik.http.routers.redis_insight.rule=Host(subdominio.SEUDOMINIO.com.br
 
 Exemplo: traefik.http.services.redis_insight.loadBalancer.server.port=5001
 
-☑️ Faça a configuração do subdominio no Cloudflare. ☑️ Não esqueça de deixar o PROXY desabilitado
+☑️ Faça a configuração do subdominio no Cloudflare. 
+☑️ Não esqueça de deixar o PROXY desabilitado
 
-Limitando acesso aos recursos da VPS ☑️ Configure o máximo de recurso que o aplicativo pode utilizar. Isto evita que a sua VPS trave por ter deixado as aplicações utilizarem toda a máquina.
+Limitando acesso aos recursos da VPS 
+☑️ Configure o máximo de recurso que o aplicativo pode utilizar. Isto evita que a sua VPS trave por ter deixado as aplicações utilizarem toda a máquina.
 
 resources: limits: cpus: "1" # Define a quantidade de processadores memory: 1024M # Define a quantidade de RAM
 
-Resumo ☑️ Configurar mapeamento de pastas ☑️ Configurar mapeamento da rede interna ☑️ Configurar subdomínios no Cloudflare ☑️ Configurar subdomínio no Traefik ☑️ Configurar mapeamento de porta no Traefik ☑️ Configurar limites de recursos da VPS ✅ PRONTO! Agora que você passou pelo checklist, pode subir a stack no Portainer!
+Resumo 
+☑️ Configurar mapeamento de pastas 
+☑️ Configurar mapeamento da rede interna 
+☑️ Configurar subdomínios no Cloudflare
+☑️ Configurar subdomínio no Traefik 
+☑️ Configurar mapeamento de porta no Traefik 
+☑️ Configurar limites de recursos da VPS 
+✅ PRONTO! Agora que você passou pelo checklist, pode subir a stack no Portainer!
