@@ -1,0 +1,72 @@
+version: "3.7"
+
+services:
+  # Define o Serviço do Flowise
+  flowise:
+    # Usa a imagem do Flowise no Docker Hub
+    image: flowiseai/flowise:1.8.2
+    # Define o comando que inicia o Flowise
+    # command: flowise start # ................. COMANDO UTILIZADO ANTES DA VERSÃO 1.8.2
+    entrypoint: ["flowise", "start"] # ......... COMANDO UTILIZADO A PARTIR DA VERSÃO 1.8.2
+    # Define a rede que o container vai usar
+    networks:
+     - minha_rede
+    # Define o volume que irá armazenar os dados do Flowise
+    volumes:
+     - flowise_data:/root/.flowise
+    # Define as variaveis de ambiente do Flowise
+    environment:
+     - FLOWISE_USERNAME=seu@email.com.br # Define o nome de uusuário admin do flowise
+     - FLOWISE_PASSWORD=GERAR-SENHA-DE-ACESSO-AO-FLOWISE # GERAR EM https://www.avast.com/random-password-generator#pc    
+     - DATABASE_TYPE=postgres # Define o Tipo de Banco de Dados (sempre postgres)
+     - DATABASE_HOST=postgres # Define o nome do host do banco de dados (postgres ou pgbouncer)
+     - DATABASE_PORT=5432 # Define a porta do Postgres (padrao 5432)
+     - DATABASE_USER=postgres # Define o usuário do banco de dados
+     - DATABASE_PASSWORD=SENHA-DE-ACESSO-AO-POSTGRES # Informa a senha de acesso ao banco de dados
+     - DATABASE_NAME=flowise # Define o nome do banco de dados
+     - EXECUTION_MODE=main # Define se o processo será único (main) ou escalável (child) - Mudar para child só quando realmente for necessário, pois exige bastante da máquina
+     - FLOWISE_SECRETKEY_OVERWRITE=CHAVE-PARA-CRIPTOGRAFIA-CHAVES # GERAR EM https://www.avast.com/random-password-generator#pc
+     - APIKEY_PATH=/root/.flowise
+     - SECRETKEY_PATH=/root/.flowise
+     - OVERRIDE_DATABASE=false # Parametros Personalizados
+     - DISABLE_FLOWISE_TELEMETRY=true
+    deploy:
+      # Define o modo de deploy do container
+      mode: replicated
+      # Define o numero de replicas do container (sempre 1)
+      replicas: 1
+      # Define o local onde o container será executado
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          # Define a quantidade de CPU para o Flowise para evitar travamento do Host
+          cpus: "1"
+          # Define a quantidade de RAM para o Flowise para evitar travamento do Host
+          memory: 1024M
+      labels:
+        # Habilita o traefik para o serviço
+        - traefik.enable=true
+        # Define o dominio do Flowise
+        - traefik.http.routers.flowise.rule=Host(`subdominio.SEUDOMINIO.com.br`)
+        # Define o tipo de entrada do Flowise para HTTPS
+        - traefik.http.routers.flowise.entrypoints=websecure
+        # Define o certificado do Flowise
+        - traefik.http.routers.flowise.tls.certresolver=letsencryptresolver
+        # Define a porta do serviço no traefik
+        - traefik.http.services.flowise.loadBalancer.server.port=3000
+        # Define o nome do serviço no traefik
+        - traefik.http.routers.flowise.service=flowise
+
+# Define as Redes
+networks:
+  minha_rede:
+    external: true
+    name: minha_rede
+
+# Define os Volumes
+volumes:
+  flowise_data:
+    external: true
+    name: flowise_data
